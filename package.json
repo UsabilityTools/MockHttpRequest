@@ -1,7 +1,8 @@
 {
   "name": "MockHttpRequest",
-  "description": "A mock implementation of XMLHttpRequest for unit testing",
   "version": "0.0.0",
+  "description": "A mock implementation of XMLHttpRequest. For unit testing.",
+  "main": "dist/mock-http-request.js",
   "keywords": [
     "testing",
     "unit",
@@ -10,11 +11,29 @@
     "http",
     "request"
   ],
+  "licenses": [
+    {
+      "name": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "homepage": "http://github.com/philikon/MockHttpRequest",
+  "bugs": "http://github.com/philikon/MockHttpRequest/issues",
+  "repositories": [
+    {
+      "type": "git",
+      "url": "http://github.com/philikon/MockHttpRequest"
+    }
+  ],
   "maintainers": [
     {
       "name": "Philipp von Weitershausen",
       "email": "philipp@weitershausen.de",
       "web": "http://philikon.de"
+    },
+    {
+      "name": "Eryk Napierała",
+      "email": "eryk.piast@gmail.com"
     }
   ],
   "contributors": [
@@ -22,23 +41,42 @@
       "name": "Philipp von Weitershausen",
       "email": "philipp@weitershausen.de",
       "web": "http://philikon.de"
-    }
-  ],
-  "bugs": "http://github.com/philikon/MockHttpRequest/issues",
-  "licenses": [
+    },
     {
-      "name": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
-    }
-  ],
-  "repositories": [
-    {
-      "type": "git",
-      "url": "http://github.com/philikon/MockHttpRequest"
+      "name": "Eryk Napierała",
+      "email": "eryk.piast@gmail.com"
     }
   ],
   "dependencies": {
-    "event-target": "^0.1.0"
+    "core-js": "^0.9.13",
+    "event-target": "^0.1.0",
+    "extend": "^2.0.1",
+    "map-values": "^1.0.1"
   },
-  "homepage": "http://github.com/philikon/MockHttpRequest"
+  "devDependencies": {
+    "babel": "~5.4",
+    "babelify": "~6.1",
+    "browserify": "~10.2",
+    "chai": "~2.3",
+    "jscs": "~1.13",
+    "jshint": "~2.7",
+    "mocha": "~2.2",
+    "uglify-js": "~2.4"
+  },
+  "scripts": {
+    "jshint": "jshint src/",
+    "jscs": "jscs src/",
+    "mocha": "mocha --compilers js:babel/register --reporter spec --ui tdd test",
+    "test": "npm run jshint && npm run mocha",
+    "browserify": "browserify src/index.js -t babelify --standalone MockHttpRequest --outfile dist/mock-http-request.js",
+    "uglify": "uglifyjs dist/mock-http-request.js -o dist/mock-http-request.min.js",
+    "dist": "npm run browserify && npm run uglify",
+    "precompile": "rm -rf dist/ && mkdir -p dist",
+    "compile": "babel -d dist/ src/",
+    "prepublish": "npm run precompile && npm run compile",
+    "release": "npm run release-patch",
+    "release-patch": "git checkout master && npm run prepublish; git commit -a -m 'Build dist/'; npm version patch && git push origin master --tags && npm publish",
+    "release-minor": "git checkout master && npm run prepublish; git commit -a -m 'Build dist/'; npm version minor && git push origin master --tags && npm publish",
+    "release-major": "git checkout master && npm run prepublish; git commit -a -m 'Build dist/'; npm version major && git push origin master --tags && npm publish"
+  }
 }
