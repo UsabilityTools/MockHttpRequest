@@ -1,8 +1,8 @@
-var EventEmitter = require('events').EventEmitter;
-var util = require('util');
-var extend = require('extend');
-var mapValues = require('map-values');
-var Promise = require('core-js/library/fn/promise');
+import 'core-js/fn/object/entries';
+import { EventEmitter } from 'events';
+
+import mapValues from 'map-values';
+import Promise from 'core-js/library/fn/promise';
 
 
 // queue functions to call in some unspecified future
@@ -54,6 +54,7 @@ function _createRequestFacade(request, loadEndCallback) {
     return {
         url: request.url,
         origin: request.origin,
+        method: request.method,
         requestHeaders: request.headers,
         data: request.data,
         getResponse: function() {
@@ -147,23 +148,20 @@ function _createRequestFacade(request, loadEndCallback) {
 }
 
 
+class HttpServer extends EventEmitter {
+    constructor() {
+        super();
 
-function HttpServer() {
-    EventEmitter.call(this);
+        this._pending = [];
+        this._finished = [];
+    }
 
-    this._pending = [];
-    this._finished = [];
-}
-
-util.inherits(HttpServer, EventEmitter);
-
-extend(HttpServer.prototype, {
     /**
      * @method receive - takes request
      * @access public
      * @param  {Object} request - request to receive
      */
-    receive: function (request) {
+    receive(request) {
         var req = _createRequestFacade(request, function() {
             var index = this._pending.indexOf(req);
 
@@ -171,20 +169,28 @@ extend(HttpServer.prototype, {
                 this._pending.splice(index, 1);
                 this._finished.push(req);
             }
+
+            return true;
         }.bind(this));
 
         this._pending.push(req);
         this.emit('request', req);
-    },
+    }
 
-    getPendingRequests: function () {
+    getPendingRequests() {
         return this._pending;
-    },
+    }
 
-    getFinishedRequests: function () {
+    getFinishedRequests() {
         return this._finished;
     }
-});
+
+    finishAll() {
+        for(let [ , request] of Object.entries(this._pending)) {
+            request.sendError(new Error('ERR_CONNECTION_REFUSED'));
+        }
+    }
+}
 
 
-module.exports = new HttpServer();
+export default new HttpServer();

@@ -2,7 +2,7 @@
 
 import { assert } from 'chai';
 
-// import server from '../src/lib/server';
+import server from '../src/lib/server';
 import Request from '../src/lib/request';
 
 
@@ -85,7 +85,53 @@ suite('API', () => {
 
     });
 
-    
+});
 
+
+suite('sending request', () => {
+    let request;
+    let url = 'http://example.com/resource/1';
+
+    setup((done) => {
+        request = new Request();
+        request.open('GET', url);
+        request.send();
+
+        setTimeout(done, 50);
+    });
+
+    teardown(() => {
+        request = null;
+        server.finishAll();
+    });
+
+
+    test('should send request to server when `open` and `send` methods were called', () => {
+        let reqs = server.getPendingRequests();
+        assert.equal(reqs.length, 1);
+
+        let req = reqs[0];
+        assert.isDefined(req);
+
+        assert.equal(req.url, url);
+        assert.equal(req.method, 'GET');
+    });
+
+
+    test('should receive response from server', (done) => {
+        let req = server.getPendingRequests()[0];
+
+        req.sendHeaders({
+            'Content-type': 'text/plain'
+        }).then(() =>
+            req.sendResponse(200, 'my response')
+        ).then(() => {
+            assert.equal(req.status, 200);
+            assert.equal(req.responseText, 'my response');
+            
+            done();
+        });
+
+    });
 
 });

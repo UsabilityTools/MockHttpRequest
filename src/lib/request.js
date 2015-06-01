@@ -13,12 +13,15 @@ import {
     parseUri,
     makeXMLResponse,
     createProgressEvent,
+    Event,
     XMLHttpRequestUpload,
     XMLHttpRequestEventTarget
 } from './request-helpers';
 
 
 export default function XMLHttpRequest() {
+    XMLHttpRequestEventTarget.call(this);
+
     // These are internal flags and data structures
     this._requestHeaders = {};
     this._responseHeaders = {};
@@ -155,9 +158,9 @@ extend(XMLHttpRequest.prototype, {
             position: 0,
             totalSize: 0
         }));
-        
+
         var headers = this._requestHeaders;
-        var origin = window.location.href;
+        var origin = '';
 
         if(this.timeout) {
             setTimeout(function() {
@@ -172,7 +175,8 @@ extend(XMLHttpRequest.prototype, {
 
         server.receive({
             async: this._async,
-            url: this.url,
+            url: this._url,
+            method: this._method,
             data: data,
             origin: origin,
             headers: headers,
@@ -227,7 +231,7 @@ extend(XMLHttpRequest.prototype, {
                 Object.keys(this._requestHeaders).forEach(function(header) {
                     delete this._requestHeaders[header];
                 }, this);
-                
+
                 // but throw exception after
                 if (!this.async) {
                     throw exception;

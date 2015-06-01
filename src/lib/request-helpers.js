@@ -113,7 +113,7 @@ class EventTarget {
 
             listener.call(this, event);
         });
-          
+
         return !event.defaultPrevented;
     }
 
@@ -282,7 +282,7 @@ export function makeXMLResponse(data) {
     //     and return null.
     //  2. If final MIME type is not null, text/xml, application/xml,
     //     and does not end in +xml terminate these steps and return null.
-    
+
     // Attempt to produce an xml response
     // and it will fail if not a good xml
     try {

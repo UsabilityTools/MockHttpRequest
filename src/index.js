@@ -1,2 +1,2 @@
-module.exports.server = require('./lib/server.js');
-module.exports.Request = require('./lib/request.js');
+export { default as server } from './lib/server.js';
+export { default as Request } from './lib/request.js';
